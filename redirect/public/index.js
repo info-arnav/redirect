@@ -1,3 +1,185 @@
+function set_all(id, city, state, country_code) {
+	
+  jq.ajax({ // ajax request for getting the appropriate entry for the prefilling values
+        url: "/component/locator_suggest_json.html",
+        type: 'post',
+        dataType: 'json',
+        data: {
+          set_city: city,
+          set_state: state,
+          city_initials: city,
+          set_country: country_code 
+        },
+        success: function(data) {
+          var obj = data[0];
+          jq('#' + id + '_input').val(obj.city + ', ' + obj.state + ', ' + obj.country_name);
+          window[id + '_fill'](obj);
+        }
+  }); // end of ajax request for prefilling
+}
+</script>
+
+<script language="javascript" type="text/javascript">
+function inq_city_id_clear() {
+          jq('#inq_city_id').val('');
+          jq('#inq_country_code').val('');
+          jq('#inq_state').val('');
+          jq('#inq_city').val('');
+          if(jq("#dummy_isd_field").length) {
+            jq('#dummy_isd_field').val('');
+          }
+          if(jq("#dummy_im_contact_field").length) {
+            jq('#dummy_im_contact_field').hide();
+          }
+          //if(jq("#dummy_isd_field").length) {
+            //jq('#dummy_isd_field').val('');
+          //}
+}
+function inq_city_id_fill(obj) {
+          jq('#inq_city_id').val(obj.city_id);
+          jq('#inq_country_code').val(obj.country_code);
+          jq('#inq_state').val(obj.state);
+          jq('#inq_city').val(obj.city);
+          if(jq("#dummy_isd_field").length) {
+            jq('#dummy_isd_field').val(obj.isd_code);
+          }
+          if(jq("#dummy_im_contact_field").length && obj.im_contact == 1) {
+            jq('#dummy_im_contact_field').show();
+          }
+	  var reg = new RegExp('^\\+' + obj.isd_code,'');
+
+	  if(obj.isd_code == 91){
+            jq('#show_pin_code').show();
+	  } else {
+            jq('#show_pin_code').hide();
+	  }
+
+          if(jq("#dummy_isd_field").length && ! reg.test(jq("#dummy_isd_field").val())) {
+            jq('#dummy_isd_field').val('+' + obj.isd_code);
+          }
+}
+jq(document).ready( function() {
+    if(jq("#dummy_isd_field").length) {
+      jq('#dummy_isd_field').attr("readonly",true);
+    }
+    if(jq("#dummy_im_contact_field").length) {
+      jq('#dummy_im_contact_field').hide();
+    }
+    jq('#inq_city_id_input').bind('keyup', function() { 
+      if(jq("#inq_city_id_input").val().length == 0) {
+        //inq_city_id_clear();
+      }
+    });
+
+    jq("#inq_city_id_input").autocomplete({ // making input textbox to support autocomplete feature
+      source: function(request, response) {
+	jq(".block").attr("readonly",true);
+        jq.ajax({ // ajax request for getting the suggestions according to the characters filled till now in input textbox
+          url: "/component/locator_suggest_json.html",
+          type: 'post',
+          dataType: "json",
+          data: {
+            city_initials: request.term
+          },
+          success: function( data ) {
+            var city_initials = '^' + request.term;
+            var re = new RegExp(city_initials, "i");
+
+	 jq('#div_show_city_nearest_branches').hide();
+            if(data.length == 0) {
+              alert("The specified city: '"+jq('#inq_city_id_input').val()+"', does not exist in our database.");
+            }
+            response( jq.map( data, function( item ) {
+              var lbl;
+              var val;
+              var city = item.city;
+              if(re.test(city)) {
+                lbl = item.city + ', ' + item.state + ', ' + item.country_name;
+                val = item.city + ', ' + item.state + ', ' + item.country_name;
+              } else {
+                lbl = item.city_synonym + ', ' + item.state + ', ' + item.country_name;
+                val = item.city_synonym + ', ' + item.state + ', ' + item.country_name;
+              }
+              var result = {
+                label: lbl,
+                value: val,
+                city_id: item.city_id,
+                city: item.city,
+                state: item.state,
+                country_code: item.country_code,
+                isd_code: item.isd_code,
+                im_contact: item.im_contact
+              };
+              return result;
+            }));
+          }
+        }); // end of ajax request for getting the suggestions
+      },
+      minLength: 2,
+      select: function( event, ui ) {
+        var selectedObj = ui.item;
+        jq('#inq_city_id_input').val(selectedObj.label);
+        inq_city_id_fill(selectedObj);
+		jq(".block").attr("readonly",false);
+
+            jq.ajax({
+    url: "/component/city_branches_json.html",
+          type: 'post',
+          dataType: "json",
+          data: {
+            city_id: selectedObj.city_id 
+          },
+
+  success: function (data) {
+  	    jq('#city_nearest_branch').empty();
+	    if(data.length){
+       	      var opt_data="<option >--Select Area--</option>";
+              jq(opt_data).appendTo('#city_nearest_branch');
+              jq.each(data,function(i,item)
+              {
+
+              //alert(item.branch+":"+item.name);
+              var div_data="<option value="+item.branch+">"+item.name+ "</option>";
+              jq(div_data).appendTo('#city_nearest_branch');
+              });
+	      jq('#div_show_city_nearest_branches').show();
+	     }
+            }
+            }); 
+
+        return false;
+      },
+      change: function( event, ui ) {
+        if ( !ui.item ) {
+           // no item selected
+          inq_city_id_clear();
+	 jq('#div_show_city_nearest_branches').hide();
+        }
+      },
+      open: function( event, ui ) {
+          inq_city_id_clear();
+      },
+      close: function( event, ui ) {
+          if(jq('#inq_country_code').val().length==0 || jq('#inq_state').val().length==0 || jq('#inq_city').val().length==0) {
+            inq_city_id_clear();
+            //jq('#inq_city_id_input').val('');
+          }
+      }
+    }); // end of autocomplete
+});
+
+jq(".block").on('focus', function(){
+	if(jq(".block").attr("readonly") == "readonly"){
+	alert("Please select your City or use City not found option.");
+}
+});
+
+jq(window).load(function() {
+          jq('#inq_city_id').val();
+          jq('#inq_country_code').val('');
+          jq('#inq_state').val('');
+          jq('#inq_city').val('');
+});
 function userAgent() {
   var e,
     i,
