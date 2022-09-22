@@ -1,4 +1,5 @@
-
+abcdefg = document.getElementById("send_a_inq_")
+abcdefg.addEventListener("click", function () {window.location.replace("https://univolen.com/inquiry-html/");})
 
 function userAgent() {
   var e,
