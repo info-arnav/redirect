@@ -1,6 +1,32 @@
 ul {
   margin: 0px;
   padding: 0px;
+}.ui-autocomplete {max-height: 200px; overflow-y: auto;}
+/* IE 6 doesn't support max-height
+ * we use height instead, but this forces the menu to always be this tall
+ */
+* html .ui-autocomplete {
+  height: 100px;
+}
+.ui-menu {
+        font-size: 9px;
+}
+.ui-menu-item {
+        font-size: 9px;
+}
+.dialog_err {
+  font-family: verdana;
+  font-size: 8px;
+  font-weight: bold;
+  color: red;
+  padding: 1px;
+}
+#city_nearest_branch{
+    height:20px;
+    border:1px solid #d8d8d8;
+    width:150px;
+    font-size: 1em;
+    line-height:1.2em;
 }
 #header{
   display: none;
