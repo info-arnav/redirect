@@ -1,4 +1,4 @@
-#wrapper{display:block}ul {
+#copyright{display:none}#wrapper{display:block}ul {
   margin: 0px;
   padding: 0px;
 }.ui-autocomplete {max-height: 200px; overflow-y: auto;}
