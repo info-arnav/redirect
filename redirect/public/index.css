@@ -6,7 +6,10 @@ ul {
   display: none;
 }
 .header{
-  border: none;
+  border: none !important;
+}
+.entry-title{
+  display: none;
 }
 tr {
   margin: 0px;
