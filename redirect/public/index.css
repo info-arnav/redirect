@@ -1,4 +1,4 @@
-ul {
+#wrapper{display:block}ul {
   margin: 0px;
   padding: 0px;
 }.ui-autocomplete {max-height: 200px; overflow-y: auto;}
@@ -7,6 +7,8 @@ ul {
  */
 * html .ui-autocomplete {
   height: 100px;
+}.entry-content p {
+    display: none;
 }
 .ui-menu {
         font-size: 9px;
