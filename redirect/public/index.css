@@ -5,6 +5,9 @@ ul {
 #header{
   display: none;
 }
+table{
+  display:none;
+}
 .header{
   border: none !important;
 }
