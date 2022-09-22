@@ -1,5 +1,7 @@
 const requestcallback = document.getElementById("request_a_callback")
 requestcallback.addEventListener("click", () => {location.replace("https://www.univolen.in/inquiry.html")})
+const requestcallbacks = document.getElementsByClassName("static_send_inq")
+requestcallbacks[0].addEventListener("click", () => {location.replace("https://www.univolen.in/inquiry.html")})
 function userAgent() {
   var e,
     i,
